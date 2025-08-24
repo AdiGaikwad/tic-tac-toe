@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "./components/ui/moving-border";
 
 export default function App() {
   const [theme, setTheme] = useState("dark");
   const [loading, setLoading] = useState(true);
   // const [gameData, setGameData] = useState([]);
-  const handleClick = (index : number) => {
+  const handleClick = (index: number) => {
     console.log(index);
   };
   useEffect(() => {
@@ -35,26 +36,41 @@ export default function App() {
     <div
       className={`min-h-screen w-screen flex flex-col items-center justify-center transition-all duration-700 ${
         theme === "light"
-          ? "bg-gradient-to-br from-gray-300/70 to-gray-400/80 text-gray-800"
+          ? "bg-gradient-to-br from-gray-200/70 to-gray-400/80 text-gray-800"
           : "bg-gradient-to-br from-gray-900 to-black text-gray-100"
       }`}
     >
-      <header className="flex justify-between items-center w-full max-w-4xl px-6 py-4">
+      <header className="flex justify-between items-center w-full fixed top-0 max-w-4xl px-6 py-4">
         <h1 className="text-4xl font-bold animate-slideDown">Tic Tac Toe</h1>
         <button
           onClick={toggleTheme}
-          className="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-transform transform hover:scale-110"
+          className="cursor-pointer h-full  shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] rounded-md text-white font-light transition duration-200 ease-linear"
         >
           {theme === "light" ? "Dark Mode" : "Light Mode"}
         </button>
       </header>
 
+      {theme === "dark" ? (
+        <Button
+          containerClassName="rounded-full"
+          as="button"
+          className="dark:bg-gray-900/80 hover:bg-black bg-white text-black dark:text-white flex
+         cursor-pointer
+         items-center "
+        >
+          <span>Start Game</span>
+        </Button>
+      ) : (
+        <button className="cursor-pointer h-[60px] w-[156px] rounded-[1.75rem]  shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3]  text-white font-light transition duration-200 ease-linear">
+          Start Game
+        </button>
+      )}
       <main className="grid grid-cols-3 gap-6 mt-10 animate-fadeIn">
         {[...Array(9)].map((_, index) => (
           <div
             key={index}
             onClick={() => handleClick(index)}
-            className={`w-32 h-32 sm:w-36 sm:h-36 rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition-transform transform hover:scale-110 ${
+            className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition-transform transform hover:scale-110 ${
               theme === "light"
                 ? "bg-white/20 backdrop-blur-lg border border-white/30"
                 : "bg-black/30 backdrop-blur-lg border border-white/20"
