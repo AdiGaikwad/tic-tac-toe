@@ -1,13 +1,48 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Button } from "./components/ui/moving-border";
 
 export default function App() {
   const [theme, setTheme] = useState("dark");
   const [loading, setLoading] = useState(true);
-  // const [gameData, setGameData] = useState([]);
+  const [step, setStep] = useState<"start" | "choose" | "board">("start");
+  const [player1Choice, setPlayer1Choice] = useState<"X" | "O" | null>(null);
+  const [player1Next, setPlayer1Next] = useState(true);
+  // const [history, setHitory] = useState(null);
+  type gameData = [
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null,
+    "X" | "O" | null
+  ];
+  const initialGame = Array(9).fill(null);
+
+  const [gamedata, setGameData] = useState<gameData>(initialGame);
+
   const handleClick = (index: number) => {
-    console.log(index);
+    
+    if (!gamedata || gamedata.length < 1) {
+      gamedata[index] = player1Choice;
+    }
+    const nxtSquares = gamedata.slice()
+    console.log(nxtSquares)
+    if (gamedata[index - 1] == "X") gamedata[index] = "O";
+    else gamedata[index] = "X";
+
+    setGameData(gamedata);
+    console.log(gamedata)
+    // const game = gamedata
+    // game[index] = playerChoice
+    // setGameData([...gamedata])
+    // console.log(`Clicked cell: ${index}`);
+    // console.log(playerChoice)
   };
+
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
@@ -44,40 +79,93 @@ export default function App() {
         <h1 className="text-4xl font-bold animate-slideDown">Tic Tac Toe</h1>
         <button
           onClick={toggleTheme}
-          className="cursor-pointer h-full  shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] rounded-md text-white font-light transition duration-200 ease-linear"
+          className="cursor-pointer shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] rounded-md text-white font-light transition duration-200 ease-linear"
         >
           {theme === "light" ? "Dark Mode" : "Light Mode"}
         </button>
       </header>
 
-      {theme === "dark" ? (
-        <Button
-          containerClassName="rounded-full"
-          as="button"
-          className="dark:bg-gray-900/80 hover:bg-black bg-white text-black dark:text-white flex
-         cursor-pointer
-         items-center "
+      {step === "start" && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="mt-20"
         >
-          <span>Start Game</span>
-        </Button>
-      ) : (
-        <button className="cursor-pointer h-[60px] w-[156px] rounded-[1.75rem]  shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3]  text-white font-light transition duration-200 ease-linear">
-          Start Game
-        </button>
+          {theme === "dark" ? (
+            <Button
+              containerClassName="rounded-full"
+              as="button"
+              onClick={() => setStep("choose")}
+              className="dark:bg-gray-900/80 hover:bg-black  dark:text-white flex cursor-pointer items-center"
+            >
+              <span>Start Game</span>
+            </Button>
+          ) : (
+            <button
+              onClick={() => setStep("choose")}
+              className="cursor-pointer h-[60px] w-[156px] rounded-[1.75rem] shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] text-white font-light transition duration-200 ease-linear"
+            >
+              Start Game
+            </button>
+          )}
+        </motion.div>
       )}
-      <main className="grid grid-cols-3 gap-6 mt-10 animate-fadeIn">
-        {[...Array(9)].map((_, index) => (
-          <div
-            key={index}
-            onClick={() => handleClick(index)}
-            className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition-transform transform hover:scale-110 ${
-              theme === "light"
-                ? "bg-white/20 backdrop-blur-lg border border-white/30"
-                : "bg-black/30 backdrop-blur-lg border border-white/20"
-            }`}
-          ></div>
-        ))}
-      </main>
+
+      {step === "choose" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col items-center mt-20 space-y-6"
+        >
+          <h1 className="text-2xl font-semibold">Player 1</h1>
+
+          <h2 className="text-2xl font-semibold">Choose your symbol</h2>
+          <div className="flex gap-8">
+            {["X", "O"].map((choice) => (
+              <motion.button
+                key={choice}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setPlayer1Choice(choice);
+                  setStep("board");
+                }}
+                className="text-4xl px-8 py-4 rounded-xl cursor-pointer bg-blue-500 text-white font-bold shadow-lg hover:bg-blue-600"
+              >
+                {choice}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {step === "board" && (
+        <motion.main
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="grid grid-cols-3 gap-6 mt-16"
+        >
+          {[...Array(9)].map((_, index) => (
+            <motion.p
+              key={index}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
+              onClick={() => handleClick(index)}
+              className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition-transform transform hover:scale-110 ${
+                theme === "light"
+                  ? "bg-white/20 backdrop-blur-lg border border-white/30"
+                  : "bg-black/30 backdrop-blur-lg border border-white/20"
+              }`}
+            >
+            {gamedata && gamedata[index]}
+            </motion.p>
+          ))}
+        </motion.main>
+      )}
     </div>
   );
 }
