@@ -31,7 +31,7 @@ export default function App() {
     }
     if (player1Next) gamedata[index] = player1Choice;
     else gamedata[index] = player1Choice == "X" ? "O" : "X";
-
+    console.log(gamedata)
     setGameData(gamedata);
     setPlayer1Next(!player1Next);
   };
@@ -40,6 +40,19 @@ export default function App() {
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  const checkWinner = () => {
+    const checklist = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+  };
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -155,6 +168,7 @@ export default function App() {
                   : "bg-black/30 backdrop-blur-lg border border-white/20"
               }`}
             >
+               
               {gamedata && gamedata[index]}
             </motion.p>
           ))}
