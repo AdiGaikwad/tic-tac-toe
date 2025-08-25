@@ -20,27 +20,20 @@ export default function App() {
     "X" | "O" | null,
     "X" | "O" | null
   ];
-  const initialGame = Array(9).fill(null);
+  const initialGame = Array(9).fill(null) as gameData;
+  const choices = ["X", "O"] as const;
 
   const [gamedata, setGameData] = useState<gameData>(initialGame);
 
   const handleClick = (index: number) => {
-    
     if (!gamedata || gamedata.length < 1) {
       gamedata[index] = player1Choice;
     }
-    const nxtSquares = gamedata.slice()
-    console.log(nxtSquares)
-    if (gamedata[index - 1] == "X") gamedata[index] = "O";
-    else gamedata[index] = "X";
+    if (player1Next) gamedata[index] = player1Choice;
+    else gamedata[index] = player1Choice == "X" ? "O" : "X";
 
     setGameData(gamedata);
-    console.log(gamedata)
-    // const game = gamedata
-    // game[index] = playerChoice
-    // setGameData([...gamedata])
-    // console.log(`Clicked cell: ${index}`);
-    // console.log(playerChoice)
+    setPlayer1Next(!player1Next);
   };
 
   useEffect(() => {
@@ -104,7 +97,8 @@ export default function App() {
           ) : (
             <button
               onClick={() => setStep("choose")}
-              className="cursor-pointer h-[60px] w-[156px] rounded-[1.75rem] shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] text-white font-light transition duration-200 ease-linear"
+              className="cursor-pointer h-[60px] w-[156px] rounded-[1.75rem] shadow-[0_4px_14px_0_rgb(0,118,255,39%)]
+           hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3]  text-white font-light transition duration-200 ease-linear"
             >
               Start Game
             </button>
@@ -123,7 +117,7 @@ export default function App() {
 
           <h2 className="text-2xl font-semibold">Choose your symbol</h2>
           <div className="flex gap-8">
-            {["X", "O"].map((choice) => (
+            {choices.map((choice) => (
               <motion.button
                 key={choice}
                 whileHover={{ scale: 1.1 }}
@@ -132,7 +126,7 @@ export default function App() {
                   setPlayer1Choice(choice);
                   setStep("board");
                 }}
-                className="text-4xl px-8 py-4 rounded-xl cursor-pointer bg-blue-500 text-white font-bold shadow-lg hover:bg-blue-600"
+                className="text-4xl px-8 py-4 rounded-xl cursor-pointer shadow-[0_4px_14px_0_rgb(0,118,255,45%)] hover:shadow-[0_6px_20px_rgba(0,118,255,60%)] hover:bg-[rgba(0,118,255,0.9)]  bg-[#0070f3]  text-white font-light transition duration-200 ease-linear"
               >
                 {choice}
               </motion.button>
@@ -161,7 +155,7 @@ export default function App() {
                   : "bg-black/30 backdrop-blur-lg border border-white/20"
               }`}
             >
-            {gamedata && gamedata[index]}
+              {gamedata && gamedata[index]}
             </motion.p>
           ))}
         </motion.main>
