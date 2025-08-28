@@ -38,15 +38,19 @@ export default function App() {
   const [gamedata, setGameData] = useState<gameData>(initialGame);
 
   const handleClick = (index: number) => {
-    if (!gamedata || gamedata.length < 1) {
-      gamedata[index] = player1Choice;
+    if (gamedata.includes(null)) {
+      if (!gamedata || gamedata.length < 1) {
+        gamedata[index] = player1Choice;
+      }
+      if (player1Next) gamedata[index] = player1Choice;
+      else gamedata[index] = player1Choice == "X" ? "O" : "X";
+      console.log(gamedata);
+      setGameData(gamedata);
+      checkWinner();
+      setPlayer1Next(!player1Next);
+    } else {
+      setModal(true);
     }
-    if (player1Next) gamedata[index] = player1Choice;
-    else gamedata[index] = player1Choice == "X" ? "O" : "X";
-    console.log(gamedata);
-    setGameData(gamedata);
-    checkWinner();
-    setPlayer1Next(!player1Next);
   };
 
   useEffect(() => {
@@ -65,6 +69,7 @@ export default function App() {
       [0, 4, 8],
       [2, 4, 6],
     ];
+    let winner = false;
     for (let i = 0; i < checklist.length; i++) {
       const [a, b, c] = checklist[i];
       if (
@@ -78,6 +83,13 @@ export default function App() {
         console.log(gamedata[a], " Is the winner");
         setWinner(gamedata[a] == player1Choice ? "Player 1" : "Player 2");
         setModal(true);
+        winner = true;
+      }
+
+      if (!winner && !gamedata.includes(null)) {
+        setWinner("Tie");
+        console.log("Game Tie");
+        setModal(true);
       }
     }
   };
@@ -86,12 +98,9 @@ export default function App() {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  const newGame = ()=>{
-    setGameData(initialGame);
-    setPlayer1Choice(null)
-    setWinner("")
-    setStep("start")
-  }
+  const newGame = () => {
+    window.location.reload();
+  };
   if (loading) {
     return (
       <div
@@ -115,18 +124,27 @@ export default function App() {
           : "bg-gradient-to-br from-gray-900 to-black text-gray-100"
       }`}
     >
-      <AlertDialog  open={modalOpen} onOpenChange={() => setModal(!modalOpen)}>
+      <AlertDialog open={modalOpen} onOpenChange={() => setModal(!modalOpen)}>
         <AlertDialogContent className={theme}>
           <AlertDialogHeader>
-            <AlertDialogTitle>{winner} won the Game!</AlertDialogTitle>
+            <AlertDialogTitle>
+              {winner != "Tie" ? `${winner} won the Game!` : "Game Tie !"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {winner} won the Game !
-
+              {winner != "Tie"
+                ? `${winner} won the Game!`
+                : "It's a tie! No winner this time."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={()=> {newGame()}}>New Game</AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => {
+                newGame();
+              }}
+            >
+              New Game
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
