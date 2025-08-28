@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/moving-border";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function App() {
   const [theme, setTheme] = useState("dark");
@@ -8,6 +18,8 @@ export default function App() {
   const [step, setStep] = useState<"start" | "choose" | "board">("start");
   const [player1Choice, setPlayer1Choice] = useState<"X" | "O" | null>(null);
   const [player1Next, setPlayer1Next] = useState(true);
+  const [winner, setWinner] = useState<string>("");
+  const [modalOpen, setModal] = useState(false);
   // const [history, setHitory] = useState(null);
   type gameData = [
     "X" | "O" | null,
@@ -31,8 +43,9 @@ export default function App() {
     }
     if (player1Next) gamedata[index] = player1Choice;
     else gamedata[index] = player1Choice == "X" ? "O" : "X";
-    console.log(gamedata)
+    console.log(gamedata);
     setGameData(gamedata);
+    checkWinner();
     setPlayer1Next(!player1Next);
   };
 
@@ -52,6 +65,21 @@ export default function App() {
       [0, 4, 8],
       [2, 4, 6],
     ];
+    for (let i = 0; i < checklist.length; i++) {
+      const [a, b, c] = checklist[i];
+      if (
+        gamedata[a] &&
+        gamedata[b] &&
+        gamedata[c] &&
+        gamedata[a] === gamedata[b] &&
+        gamedata[b] === gamedata[c] &&
+        gamedata[c] === gamedata[a]
+      ) {
+        console.log(gamedata[a], " Is the winner");
+        setWinner(gamedata[a] == player1Choice ? "Player 1" : "Player 2");
+        setModal(true);
+      }
+    }
   };
 
   const toggleTheme = () => {
@@ -81,6 +109,21 @@ export default function App() {
           : "bg-gradient-to-br from-gray-900 to-black text-gray-100"
       }`}
     >
+      <AlertDialog  open={modalOpen} onOpenChange={() => setModal(!modalOpen)}>
+        <AlertDialogContent className={theme}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{winner} won the Game!</AlertDialogTitle>
+            <AlertDialogDescription>
+              {winner} won the Game !
+
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>New Game</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <header className="flex justify-between items-center w-full fixed top-0 max-w-4xl px-6 py-4">
         <h1 className="text-4xl font-bold animate-slideDown">Tic Tac Toe</h1>
         <button
@@ -168,7 +211,6 @@ export default function App() {
                   : "bg-black/30 backdrop-blur-lg border border-white/20"
               }`}
             >
-               
               {gamedata && gamedata[index]}
             </motion.p>
           ))}
