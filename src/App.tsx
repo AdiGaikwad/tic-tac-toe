@@ -86,6 +86,12 @@ export default function App() {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
+  const newGame = ()=>{
+    setGameData(initialGame);
+    setPlayer1Choice(null)
+    setWinner("")
+    setStep("start")
+  }
   if (loading) {
     return (
       <div
@@ -120,7 +126,7 @@ export default function App() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>New Game</AlertDialogAction>
+            <AlertDialogAction onClick={()=> {newGame()}}>New Game</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
