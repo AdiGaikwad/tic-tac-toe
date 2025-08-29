@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/moving-border";
 import {
@@ -39,15 +39,17 @@ export default function App() {
 
   const handleClick = (index: number) => {
     if (gamedata.includes(null)) {
-      if (!gamedata || gamedata.length < 1) {
-        gamedata[index] = player1Choice;
+      if (!gamedata[index] && gamedata[index] == null) {
+        if (!gamedata || gamedata.length < 1) {
+          gamedata[index] = player1Choice;
+        }
+        if (player1Next) gamedata[index] = player1Choice;
+        else gamedata[index] = player1Choice == "X" ? "O" : "X";
+        console.log(gamedata);
+        setGameData(gamedata);
+        checkWinner();
+        setPlayer1Next(!player1Next);
       }
-      if (player1Next) gamedata[index] = player1Choice;
-      else gamedata[index] = player1Choice == "X" ? "O" : "X";
-      console.log(gamedata);
-      setGameData(gamedata);
-      checkWinner();
-      setPlayer1Next(!player1Next);
     } else {
       setModal(true);
     }
