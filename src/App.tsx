@@ -218,29 +218,48 @@ export default function App() {
       )}
 
       {step === "board" && (
-        <motion.main
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="grid grid-cols-3 gap-6 mt-16"
-        >
-          {[...Array(9)].map((_, index) => (
-            <motion.p
-              key={index}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1, duration: 0.4 }}
-              onClick={() => handleClick(index)}
-              className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition-transform transform hover:scale-110 ${
-                theme === "light"
-                  ? "bg-white/20 backdrop-blur-lg border border-white/30"
-                  : "bg-black/30 backdrop-blur-lg border border-white/20"
-              }`}
-            >
-              {gamedata && gamedata[index]}
-            </motion.p>
-          ))}
-        </motion.main>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 ">
+          <motion.main
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="grid grid-cols-3 gap-6 mt-16"
+          >
+            {[...Array(9)].map((_, index) => (
+              <motion.p
+                key={index}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+                onClick={() => handleClick(index)}
+                className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex items-center justify-center text-3xl font-bold cursor-pointer transition-transform transform hover:scale-110 ${
+                  theme === "light"
+                    ? "bg-white/20 backdrop-blur-lg border border-white/30"
+                    : "bg-black/30 backdrop-blur-lg border border-white/20"
+                }`}
+              >
+                {gamedata && gamedata[index]}
+              </motion.p>
+            ))}
+          </motion.main>
+          <div className="w-full bg-primary/20 rounded-md text-center">
+            <h1 className="p-3">Move List</h1> <br />
+            {gamedata &&
+              gamedata
+                .map((data, index) => ({ move: data, position: index }))
+                .filter((item) => item.move !== null)
+                .map((item, moveIndex) => {
+                  return (
+                    item && (
+                      <div key={moveIndex} className="p-2 bg-accent-foreground/50 w-full my-2 rounded-lg">
+                        Move {moveIndex + 1}: {item.move} at Position{" "}
+                        {item.position + 1}
+                      </div>
+                    )
+                  );
+                })}
+          </div>
+        </div>
       )}
     </div>
   );
