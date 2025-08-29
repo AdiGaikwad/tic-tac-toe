@@ -20,39 +20,33 @@ export default function App() {
   const [player1Next, setPlayer1Next] = useState(true);
   const [winner, setWinner] = useState<string>("");
   const [modalOpen, setModal] = useState(false);
-  // const [history, setHitory] = useState(null);
-  type gameData = [
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null,
-    "X" | "O" | null
-  ];
-  const initialGame = Array(9).fill(null) as gameData;
+
+  type Cell = { mark: "X" | "O" | null; move?: number };
+
+  const initialGame: Cell[] = Array.from({ length: 9 }, () => ({ mark: null }));
   const choices = ["X", "O"] as const;
 
-  const [gamedata, setGameData] = useState<gameData>(initialGame);
+  const [gamedata, setGameData] = useState<Cell[]>(initialGame);
 
   const handleClick = (index: number) => {
-    if (gamedata.includes(null)) {
-      if (!gamedata[index] && gamedata[index] == null) {
-        if (!gamedata || gamedata.length < 1) {
-          gamedata[index] = player1Choice;
-        }
-        if (player1Next) gamedata[index] = player1Choice;
-        else gamedata[index] = player1Choice == "X" ? "O" : "X";
-        console.log(gamedata);
-        setGameData(gamedata);
-        checkWinner();
-        setPlayer1Next(!player1Next);
-      }
-    } else {
-      setModal(true);
-    }
+    if (!player1Choice) return;
+    if (gamedata[index]?.mark) return;
+
+    const nextMoveNum =
+      gamedata.reduce((m, c) => Math.max(m, c.move ?? 0), 0) + 1;
+
+    const playerMark = player1Next
+      ? player1Choice
+      : player1Choice === "X"
+      ? "O"
+      : "X";
+
+    const newData = gamedata.slice();
+    newData[index] = { mark: playerMark, move: nextMoveNum };
+
+    setGameData(newData);
+    checkWinner(newData);
+    setPlayer1Next(!player1Next);
   };
 
   useEffect(() => {
@@ -60,7 +54,7 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  const checkWinner = () => {
+  const checkWinner = (gamedata: Cell[]) => {
     const checklist = [
       [0, 1, 2],
       [3, 4, 5],
@@ -72,23 +66,25 @@ export default function App() {
       [2, 4, 6],
     ];
     let winner = false;
+    console.log(gamedata);
     for (let i = 0; i < checklist.length; i++) {
       const [a, b, c] = checklist[i];
       if (
-        gamedata[a] &&
-        gamedata[b] &&
-        gamedata[c] &&
-        gamedata[a] === gamedata[b] &&
-        gamedata[b] === gamedata[c] &&
-        gamedata[c] === gamedata[a]
+        gamedata[a].mark &&
+        gamedata[b].mark &&
+        gamedata[c].mark &&
+        gamedata[a].mark === gamedata[b].mark &&
+        gamedata[b].mark === gamedata[c].mark &&
+        gamedata[c].mark === gamedata[a].mark
       ) {
         console.log(gamedata[a], " Is the winner");
-        setWinner(gamedata[a] == player1Choice ? "Player 1" : "Player 2");
+        setWinner(gamedata[a].mark == player1Choice ? "Player 1" : "Player 2");
         setModal(true);
         winner = true;
+        return;
       }
 
-      if (!winner && !gamedata.includes(null)) {
+      if (!winner && !gamedata.find((a) => a.mark == null)) {
         setWinner("Tie");
         console.log("Game Tie");
         setModal(true);
@@ -150,7 +146,7 @@ export default function App() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <header className="flex justify-between items-center w-full fixed top-0 max-w-4xl px-6 py-4">
+      <header className={`flex ${step != "board" ? "fixed" : "absolute"} justify-between items-center w-full  top-0 max-w-4xl px-6 py-4`}>
         <h1 className="text-4xl font-bold animate-slideDown">Tic Tac Toe</h1>
         <button
           onClick={toggleTheme}
@@ -238,26 +234,28 @@ export default function App() {
                     : "bg-black/30 backdrop-blur-lg border border-white/20"
                 }`}
               >
-                {gamedata && gamedata[index]}
+                {gamedata && gamedata[index].mark}
               </motion.p>
             ))}
           </motion.main>
           <div className="w-full bg-primary/20 rounded-md text-center">
             <h1 className="p-3">Move List</h1> <br />
-            {gamedata &&
-              gamedata
-                .map((data, index) => ({ move: data, position: index }))
-                .filter((item) => item.move !== null)
-                .map((item, moveIndex) => {
-                  return (
-                    item && (
-                      <div key={moveIndex} className="p-2 bg-accent-foreground/50 w-full my-2 rounded-lg">
-                        Move {moveIndex + 1}: {item.move} at Position{" "}
-                        {item.position + 1}
-                      </div>
-                    )
-                  );
-                })}
+            {gamedata
+              .map((cell, pos) => ({
+                pos,
+                mark: cell.mark,
+                move: cell.move ?? 0,
+              }))
+              .filter((c) => c.mark !== null)
+              .sort((a, b) => a.move - b.move)
+              .map((m, idx) => (
+                <div
+                  key={`${m.pos}-${m.move}`}
+                  className="p-2 bg-accent-foreground/50 w-full my-2 rounded-lg"
+                >
+                  Move {idx + 1}: {m.mark} at Position {m.pos + 1}
+                </div>
+              ))}
           </div>
         </div>
       )}
